@@ -1,0 +1,54 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 18px;
+  font-family: 'Montserrat', sans-serif;
+  color: whitesmoke;
+  background: white;
+}
+
+.site {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  color: rgba(255,255,255,0.9);
+  @media (min-height: 450px) {
+    height: 100vh;
+  }
+}
+
+.content {
+  padding: 1em;
+  border-radius: 5px;
+  text-align: center;
+  min-width: 300px;
+  background: rgba(0,0,0, 0.4);
+}
+
+.v-container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.weather-icon {
+  font-size: 4em;
+  color: #63b9eb;
+}
+
+.wi-wind {
+  font-size: 2em;
+  color: #63b9eb;
+}
+
+.toggle-celsius-btn {
+  font-size: 1.2em;
+  text-decoration: none;
+  color: #998f5c;
+}

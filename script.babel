@@ -1,0 +1,126 @@
+window.addEventListener('load', function(e) {
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    const key = '87fba006df31ec725333a2305c4af87a';
+    const corsProxy = 'https://cors-anywhere.herokuapp.com/';
+    const urlBase = 'http://api.openweathermap.org/data/2.5/weather';
+    const posParam = '?lat=' + pos.coords.latitude +
+      '&lon=' + pos.coords.longitude;
+    const apiKeyParam = '&APPID=' + key;
+    const units = '&units=imperial';
+    const fullUrl = corsProxy + urlBase + posParam + apiKeyParam + units;
+    const request = new XMLHttpRequest();
+    request.open('GET', fullUrl, true);
+    request.addEventListener('load', function() {
+      if (request.status === 200) {
+        const data = JSON.parse(request.responseText);
+        setInnerHTML('.sky-cond', data.weather[0].main);
+        setInnerHTML('.temp', data.main.temp.toFixed(1) + '°F');
+        setInnerHTML('.location', data.name);
+        setWindDirection('.wind', data.wind.deg);
+        setInnerHTML('.wind-speed', data.wind.speed);
+        setIcon('.weather-icon', data.weather[0].icon);
+        setBackground(data.weather[0].icon);
+        createCelsiusButton(data.main.temp);
+      }
+    });
+    request.send();
+  });
+});
+
+function createCelsiusButton(temp) {
+  const celsiusButton =  document.querySelector(".toggle-celsius-btn");
+  let isCelsius = false;
+  celsiusButton.addEventListener("click", function (event) {
+    isCelsius = !isCelsius;
+    event.target.innerHTML = isCelsius ?
+          `${convertToCelsius(temp).toFixed(1)}°C`:`${temp.toFixed(1)}°F`
+  }); 
+}
+
+function convertToCelsius(temp) {
+  return (temp - 32) * 5 / 9;
+}
+
+function setInnerHTML(query, body) {
+  const element = document.querySelector(query);
+  if (element !== null) {
+    element.innerHTML = body;
+  }
+}
+
+function setIcon(query, icon) {
+  const iconId = icon.substr(0, 2);
+  const icons = {
+    "01": `wi-${icon[2] === 'd' ? 'day-sunny' : 'night-clear'}`,
+    "02": "wi-cloud",
+    "03": "wi-cloudy",
+    "04": "wi-cloudy",
+    "09": "wi-showers",
+    "10": "wi-rain",
+    "11": "wi-thunderstorm",
+    "13": "wi-snow",
+    "50": "wi-fog"
+  };
+  setInnerHTML(query, `<i class="wi ${icons[iconId]}"></i>`);
+}
+
+function setBackground(id) {
+  const backgroundId = id.substr(0, 2);
+  const baseUrl = "https://source.unsplash.com/";
+  const backgrounds = {
+    "01": id[2] === 'd' ? "E9aetBe2w40" : "weuWmzv7xnU",
+    "02": "kKDPBa5GmT4",
+    "03": "kKDPBa5GmT4",
+    "04": "kKDPBa5GmT4",
+    "09": "pv2ZlDfstXc",
+    "10": "pv2ZlDfstXc",
+    "11": "Cm5zI68Wdew",
+    "13": "W81OrMWLRvc",
+    "50": "S3UCfaKTNZQ"
+  };
+  let background = backgrounds[backgroundId];
+  background = background === undefined ?
+    backgrounds["50"] : background;
+  const htmlTag = document.querySelector('html')
+  htmlTag.style.background =
+    `url(${baseUrl + background}) no-repeat center center fixed`;
+  htmlTag.style.backgroundSize = '100% 100%';
+}
+
+function setWindDirection(query, deg) {
+  let direction = '';
+  if (deg > 348.75 || deg <= 11.25) {
+    direction = 'N <i class="wi wi-wind towards-0-deg"></i>';
+  } else if (deg > 11.25 && deg <= 33.75) {
+    direction = '<p>NNE</p> <i class="wi wi-wind towards-23-deg"></i>';
+  } else if (deg > 33.75 && deg <= 56.25) {
+    direction = '<p>NE</p> <i class="wi wi-wind towards-45-deg"></i>';
+  } else if (deg > 56.25 && deg <= 78.75) {
+    direction = '<p>ENE</p> <i class="wi wi-wind towards-68-deg"></i>'
+  } else if (deg > 78.75 && deg <= 101.25) {
+    direction = '<p>E</p> <i class="wi wi-wind towards-90-deg"></i>';
+  } else if (deg > 101.25 && deg <= 123.75) {
+    direction = '<p>ESE</p> <i class="wi wi-wind towards-113-deg"></i>';
+  } else if (deg > 123.75 && deg <= 146.25) {
+    direction = '<p>SE</p><i class="wi wi-wind towards-135-deg"></i>';
+  } else if (deg > 145.25 && deg <= 168.75) {
+    direction = '<p>SSE</p> <i class="wi wi-wind towards-158-deg"></i>';
+  } else if (deg > 168.75 && deg <= 191.25) {
+    direction = '<p>S</p> <i class="wi wi-wind towards-180-deg"></i>';
+  } else if (deg > 191.25 && deg <= 213.75) {
+    direction = '<p>SSW</p> <i class="wi wi-wind towards-203-deg"></i>';
+  } else if (deg > 213.75 && deg <= 236.25) {
+    direction = '<p>SW</p> <i class="wi wi-wind towards-225-deg"></i>';
+  } else if (deg > 236.25 && deg <= 258.75) {
+    direction = '<p>WSW</p> <i class="wi wi-wind towards-248-deg"></i>';
+  } else if (deg > 258.75 && deg <= 281.25) {
+    direction = '<p>W</p> <i class="wi wi-wind towards-270-deg"></i>';
+  } else if (deg > 281.25 && deg <= 303.75) {
+    direction = '<i class="wi wi-wind towards-293-deg"></i> <p>WNW</p>';
+  } else if (deg > 303.75 && deg <= 326.25) {
+    direction = '<p>NW</p> <i class="wi wi-wind towards-313-deg"></i>';
+  } else if (deg > 326.25 && deg <= 348.75) {
+    direction = '<p>NNW</p> <i class="wi wi-wind towards-336-deg"></i>';
+  }
+  setInnerHTML(query, direction);
+}
